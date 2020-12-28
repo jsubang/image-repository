@@ -54,7 +54,9 @@ def edit_user(col, value, user_id, cursor, db):
     cursor.execute(edit_cmd)
     db.commit()
     return
-
+    
+# checks the user credentials
+def check_credentials(username, password, cursor):
 
 ##### functions for image table #####
 def add_image(user_id, filename, filetype, cursor, db):

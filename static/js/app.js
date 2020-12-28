@@ -171,8 +171,44 @@ $(document).ready(function() {
     });
     
     
+    $("#user_login").click(function(event) {
+    
+        event.preventDefault();
+        let dataToSend = $("#login").serializeArray(); 
+        dataToSend = JSON.stringify(dataToSend);  
+        console.log(dataToSend);
+    
+        $.ajax({
+            type:"post",
+            url: "/login",
+            data: dataToSend,
+    
+            // what the response will be
+            // dataType: "json",
+    
+            // What we are sending
+            contentType: "application/json",
+            processData: false,
+            success: function(response, textstatus, xhr){
+                // let message_to_display = response[0]["value"]
+                // $('#currStatus').html(message_to_display);
+                location.reload();
+    
+            },
+            failure: function(jqXhr, textStatus, errorThrown) {
+                // console.log(errorThrown);
+            }        
+        });
+    
+        // Document.location.reload();
+    
+        
+    });
     
 });
+
+
+
 
 
 

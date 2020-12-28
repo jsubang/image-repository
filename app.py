@@ -65,6 +65,15 @@ def index(name=None):
 @app.route('/login', methods=['post'])
 def login(name=None):
     login_details = request.get_json()
+    print(login_details)
+
+
+    # check credentials
+    # if wrong return 401 unauthorized
+
+    # else return 200 if ok
+
+
     return redirect(url_for('index'))
 
 
