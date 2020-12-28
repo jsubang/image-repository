@@ -7,6 +7,11 @@
     margin-top: 2%;
 }
 
+
+label {
+    color: beige;
+}
+
 /* .row {
     padding-right: 1%;
     padding-left: 1%;

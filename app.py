@@ -3,7 +3,7 @@
 import os
 import json
 
-from flask import Flask, flash, render_template, request, redirect, url_for
+from flask import Flask, flash, render_template, request, redirect, url_for, session
 from werkzeug.utils import secure_filename
 
 # database functions
@@ -42,16 +42,30 @@ app.config['SESSION_COOKIE_SAMESITE'] = "Lax"
 db = get_db(psw)
 cursor = db.cursor()
 
+# debug
+def debug():
+    session['logged_in'] = False
+    session['username'] = "Miles"
+    session['user_id'] = 6
+    return
+
+
+
 @app.route('/')
 def index(name=None):
 
     # print(add_user('dude', 'oookkk', cursor, db))
-    get_files(cursor)
+    debug()
     # session get the user_id when someone logs in...
     # also get the username so the webpage will say welcome
 
     return render_template('index.html', name=name)
 
+
+@app.route('/login', methods=['post'])
+def login(name=None):
+    login_details = request.get_json()
+    return redirect(url_for('index'))
 
 
 @app.route('/get_images', methods=['get'])
@@ -62,7 +76,14 @@ def get_images(name=None):
 @app.route('/del_image', methods=['DELETE'])
 def delete(name=None):
     to_del = request.get_json()
-    print(to_del)
+    
+    # id is to_del["file_id"]
+    print(to_del["file_id"])
+
+    # get the current logged in user.
+
+
+
     return "hueheuhue"
 
 
