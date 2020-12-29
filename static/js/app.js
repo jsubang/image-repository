@@ -150,8 +150,9 @@ $(document).ready(function() {
     $("#btn-img-upload").click(function(event){
         event.preventDefault();
     
-        let fd = new FormData();
         let fileInput = document.getElementById('img');
+        
+        console.log()
         
         if(fileInput.files.length == 0) {
             alert("please select a image to upload");
@@ -159,33 +160,38 @@ $(document).ready(function() {
         
         else {
             
-            let img = fileInput.files[0];
-    
-            fd.append('file',img);
-    
-            console.log(fileInput.files) 
-    
-            // clear the form
-            document.getElementById("upload-form").reset();
-    
-            $.ajax({
-                url: '/upload',
-                type: 'post',
-                data: fd,
-                contentType: false,
-                // contentType: "multipart/form-data",
-                processData: false,
-                success: function(response){
-                    // location.reload();
-                    getPublicImages();
-                    
-                },
-                failure: function(jqXhr, textStatus, errorThrown) {       
+
+            let numImages = fileInput.files.length;
             
-                    console.log(errorThrown);
-                } 
-            });
+            
+            for(let i = 0; i < numImages; i++) {
     
+                let fd = new FormData();
+                let img = fileInput.files[i];
+                fd.append('file', img);
+
+                // console.log(fileInput.files[i]);
+
+                $.ajax({
+                    // url: '/upload',
+                    url: '/multiupload',
+                    type: 'post',
+                    data: fd,
+                    contentType: false,
+                    processData: false,
+                    success: function(response){
+                        
+                    },
+                    failure: function(jqXhr, textStatus, errorThrown) {       
+                        console.log(errorThrown);
+                    }, 
+                    
+                });
+            }
+            
+            getPublicImages();
+            document.getElementById("upload-form").reset();
+
         }
         
     });

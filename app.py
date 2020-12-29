@@ -9,13 +9,11 @@ from werkzeug.utils import secure_filename
 # database functions
 from database import *
 
-name = "jarrylsubang"
-
-def get_files(cursor):
+def get_files():
 
     records = []
 
-    for x in get_all_images(cursor):
+    for x in get_all_images():
 
         records.append({
             'file_id':x[0],
@@ -43,9 +41,9 @@ def logout():
     return
 
 # deletes the image file from the server
-def delete_image_file(file_id, cursor):
+def delete_image_file(file_id):
 
-    filetype = get_image_type(file_id, cursor)
+    filetype = get_image_type(file_id)
     filename = UPLOAD_FOLDER + str(file_id) + '.' + filetype
 
     # check if the file exists
@@ -56,22 +54,31 @@ def delete_image_file(file_id, cursor):
     return
 
 # get the database credentials
-db = get_db(name)
-cursor = db.cursor()
+# db = get_db(name)
+# cursor = db.cursor()
+
+# close db
+# cursor.close()
+# db.close()
 
 @app.route('/')
 def index(name=None):
+
+
+    print(get_image_id(session['user_id'], "Original_Doge_meme.jpg"))
+
     return render_template('index.html', name=name)
 
 
 @app.route('/login', methods=['post'])
 def login(name=None):
+
     login_details = request.get_json()
     username = login_details[0]["value"]
     password = login_details[1]["value"]
     response = []
+    db_password = get_user_password(username)
 
-    db_password = get_user_password(username,cursor)
 
     # if its blank, username did not exist, return 
     if(db_password == ""):
@@ -83,7 +90,7 @@ def login(name=None):
         response.append({"message":"Correct password"})
         session['logged_in'] = True
         session['username'] = username
-        session['user_id'] = get_user_id(username, cursor)
+        session['user_id'] = get_user_id(username)
         return json.dumps(response), 200
 
     else:
@@ -97,7 +104,7 @@ def logout_request(name = None):
 
 @app.route('/get_images', methods=['get'])
 def get_images(name=None):
-    return get_files(cursor), 200
+    return get_files(), 200
 
 
 @app.route('/del_image', methods=['DELETE'])
@@ -112,7 +119,7 @@ def delete(name=None):
     file_id = to_del["file_id"]
 
     # get the current logged in user.
-    owner = get_image_owner(file_id, cursor)
+    owner = get_image_owner(file_id)
 
     if (owner == -1):
         return "image does not exist", 404
@@ -120,16 +127,54 @@ def delete(name=None):
     if (owner == session['user_id']):
        
         # remove the file from the server
-        delete_image_file(file_id, cursor)
+        delete_image_file(file_id)
 
         # remove from database
-        del_image_record(file_id, cursor, db)
+        del_image_record(file_id)
 
 
         return "file deleted", 200
 
     else:
         return "user does not own the file", 401
+
+@app.route('/multiupload', methods=['post'])
+def multiupload(name=None):
+
+    # cursor = db.cursor()
+
+    img = request.files['file']
+    filename = secure_filename(img.filename)
+    file_type = '.' + filename.split('.')[1]
+
+    print(filename)
+    print(session['user_id'])
+
+    # check if file exists.
+    # print(get_image_id(session['user_id'], filename, cursor))
+
+    # print(get_image_id(session['user_id'], "Original_Doge_meme.jpg", cursor))
+
+
+
+    image_id = get_image_id(session['user_id'], filename)
+    print(image_id)
+    if (image_id != -1):
+        delete_image_file(image_id)
+        del_image_record(image_id)
+        print("exists")
+    
+
+    add_image(6, filename, filename.split('.')[1])
+
+    # get the generated file_id from the server
+    output = get_image_id(6, filename)
+
+    if (output != -1):
+        file_id = get_image_id(6, filename)
+        img.save(os.path.join(app.config['UPLOAD_FOLDER'], str(file_id) + file_type))
+    
+    return redirect(url_for('index'))
 
 
 @app.route('/upload', methods=['post'])
@@ -141,13 +186,19 @@ def upload(name=None):
 
     # create a new image file record in the database
     # TODO allow private and public, will need to change add_image
-    add_image(6, filename, filename.split('.')[1], cursor, db)
+
+    # TODO error check if a file already exists in the server...
+    # allow overwrite, so delete record and create new one
+    # allow to specify public private
+
+
+    add_image(6, filename, filename.split('.')[1])
 
     # get the generated file_id from the server
-    output = get_image_id(6, filename, cursor)
+    output = get_image_id(6, filename)
 
     if (output != ()):
-        file_id = get_image_id(6, filename, cursor)[0]
+        file_id = get_image_id(6, filename)
         img.save(os.path.join(app.config['UPLOAD_FOLDER'], str(file_id) + file_type))
 
     else:

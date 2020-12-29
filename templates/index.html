@@ -120,9 +120,11 @@
                     <p class="lead text-muted">Welcome {{session['username']}}</p>
 
                     <div id = "upload">
-                        <form method = "post" action = "/upload" enctype="multipart/form-data" id="upload-form">
-                            <input type = "file" name = "img" id = "img" accept = "image/*">
+                        <form method = "post" action = "/multiupload" enctype="multipart/form-data" id="upload-form">
+                            <input type = "file" name = "img" id = "img" accept = "image/*" multiple>
                             <!-- <a href="#" id = "a-img-sel" class="btn btn-primary my-2">Select Image</a> -->
+                            <label for="private" id = "private-label">Private Upload</label>
+                            <input type="checkbox" id="private" name="private" value="Private">
                             <a href="#" id = "btn-img-upload" class="btn btn-secondary my-2">Upload</a>
                         </form>
 

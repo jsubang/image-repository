@@ -12,8 +12,6 @@ label {
     color: beige;
 }
 
-/* .row {
-    padding-right: 1%;
-    padding-left: 1%;
-    margin-top: 2%;
-} */
+#private-label {
+    color: black;
+}
