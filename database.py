@@ -3,7 +3,6 @@
 import MySQLdb
 import MySQLdb.cursors
 
-
 def get_db(psw):
     db = MySQLdb.connect(
         host = "img-repo-db.czwcl89wj6vg.us-east-2.rds.amazonaws.com",
@@ -54,9 +53,48 @@ def edit_user(col, value, user_id, cursor, db):
     cursor.execute(edit_cmd)
     db.commit()
     return
-    
-# checks the user credentials
+
+# gets the user_id associated with a username from the server, returns -1 if id is not found
+def get_user_id(username, cursor):
+    user_id = ""
+    record = get_record("username", username, cursor, "user")
+
+    if(record == None):
+        user_id = -1 
+    else:
+        user_id = record[0]   
+        
+    return user_id
+
+# gets the user password from the database, returns a blank if username does not exist in the database 
+def get_user_password(username, cursor):
+    password = ""
+    record = get_record("username", username, cursor, "user")
+
+    if(record == None):
+        password = "" 
+    else:
+        password = record[2]   
+
+    return password
+
+
+# checks the user credentials, returns True if credentials are correct, false otherwise
 def check_credentials(username, password, cursor):
+
+    # get_user password
+    db_pass = get_user_password(username, cursor)
+
+    # return false if username is not in the database
+    if(db_pass == ""):
+        return False
+
+    # compare database password with proposed password
+    if (password == db_pass):
+        return True
+    else:
+        return False
+
 
 ##### functions for image table #####
 def add_image(user_id, filename, filetype, cursor, db):

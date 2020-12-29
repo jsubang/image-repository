@@ -38,26 +38,28 @@ app.secret_key = 'gXL0cmGE6vwUxmhYOnzxXEuHNq1e6u2zGUDLni1v'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['SESSION_COOKIE_SAMESITE'] = "Lax"
 
+# logout
+def logout():
+    session['logged_in'] = False
+    session['username'] = ""
+    session['user_id'] = -1
+    return
+
 
 db = get_db(psw)
 cursor = db.cursor()
 
-# debug
-def debug():
-    session['logged_in'] = False
-    session['username'] = "Miles"
-    session['user_id'] = 6
-    return
 
+
+
+# initalize credentials
+# session['logged_in'] = False
+# session['username'] = ""
+# session['user_id'] = -1
 
 
 @app.route('/')
 def index(name=None):
-
-    # print(add_user('dude', 'oookkk', cursor, db))
-    debug()
-    # session get the user_id when someone logs in...
-    # also get the username so the webpage will say welcome
 
     return render_template('index.html', name=name)
 
@@ -65,22 +67,42 @@ def index(name=None):
 @app.route('/login', methods=['post'])
 def login(name=None):
     login_details = request.get_json()
-    print(login_details)
+    # print(login_details)
+    # print(login_details[0]["value"])
+    # print(login_details[1]["value"])
 
+    username = login_details[0]["value"]
+    password = login_details[1]["value"]
+    response = []
 
-    # check credentials
-    # if wrong return 401 unauthorized
+    db_password = get_user_password(username,cursor)
 
-    # else return 200 if ok
+    # if its blank, username did not exist, return 
+    if(db_password == ""):
+        response.append({"message":"username does not exist"})
+        return json.dumps(response), 404
 
+    # check if password is valid
+    if(db_password == password):
+        response.append({"message":"Correct password"})
+        session['logged_in'] = True
+        session['username'] = username
+        session['user_id'] = get_user_id(username, cursor)
+        return json.dumps(response), 200
 
-    return redirect(url_for('index'))
+    else:
+        response.append({"message":"Incorrect password"})
+        return json.dumps(response), 401
 
+@app.route('/logout', methods = ['post'])
+def logout_request(name = None):
+    logout()
+    return redirect(url_for('index')), 200
 
 @app.route('/get_images', methods=['get'])
 def get_images(name=None):
     # get_files(cursor)
-    return get_files(cursor)
+    return get_files(cursor), 200
 
 @app.route('/del_image', methods=['DELETE'])
 def delete(name=None):

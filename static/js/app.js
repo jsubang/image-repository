@@ -34,6 +34,14 @@ function clearImages() {
 
 }
 
+
+// clears thje username and password fields
+function resetLogin() {
+    document.getElementById("user_name").value = '';
+    document.getElementById("user_psw").value = '';
+    return;
+}
+
 function deleteImage(img_id) {
     
     // send delete request 
@@ -176,7 +184,6 @@ $(document).ready(function() {
         event.preventDefault();
         let dataToSend = $("#login").serializeArray(); 
         dataToSend = JSON.stringify(dataToSend);  
-        console.log(dataToSend);
     
         $.ajax({
             type:"post",
@@ -184,25 +191,49 @@ $(document).ready(function() {
             data: dataToSend,
     
             // what the response will be
-            // dataType: "json",
-    
+            dataType: "json",
+
             // What we are sending
             contentType: "application/json",
             processData: false,
+            statusCode: {
+                404: function() {
+                    resetLogin();
+                    alert("Username does not exist.");
+                    
+                },
+                401: function() {
+                    resetLogin();
+                    alert("Invalid password.");
+                }
+
+            },
             success: function(response, textstatus, xhr){
-                // let message_to_display = response[0]["value"]
-                // $('#currStatus').html(message_to_display);
+
+                console.log(response)
                 location.reload();
-    
+
             },
             failure: function(jqXhr, textStatus, errorThrown) {
-                // console.log(errorThrown);
+                console.log(errorThrown);
             }        
-        });
-    
-        // Document.location.reload();
-    
+        });    
         
+    });
+
+    // logout button
+    $("#logout").click(function(event) {
+
+        $.ajax({
+            type:"post",
+            url: "/logout",
+            success: function(response, textstatus, xhr){
+                location.reload();
+            },
+            failure: function(jqXhr, textStatus, errorThrown) {
+                console.log(errorThrown);
+            } 
+        });
     });
     
 });
