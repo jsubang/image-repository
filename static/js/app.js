@@ -42,6 +42,9 @@ function clearImages() {
     $("#image-display-section").empty();
 }
 
+// this for the delete page, or change permissions page
+// https://jqueryui.com/selectable/#serialize
+
 
 // clears thje username and password fields
 function resetLogin() {
@@ -74,6 +77,25 @@ function deleteImage(img_id) {
         failure: function(jqXhr, textStatus, errorThrown) {
             // console.log(errorThrown);
         } 
+    });
+
+}
+
+function upload_image(fd) {
+
+    return $.ajax({
+        // url: '/upload',
+        url: '/multiupload',
+        type: 'post',
+        data: fd,
+        contentType: false,
+        processData: false,
+        success: function(response){
+        },
+        failure: function(jqXhr, textStatus, errorThrown) {       
+            console.log(errorThrown);
+        }, 
+        
     });
 
 }
@@ -142,11 +164,6 @@ function displayImages(json) {
         displaySection.appendChild(outerDiv);
     }
 
-
-    
-
-
-
 }
 
 $(document).ready(function() {
@@ -186,27 +203,37 @@ $(document).ready(function() {
 
                 // console.log(fileInput.files[i]);
 
-                $.ajax({
-                    // url: '/upload',
-                    url: '/multiupload',
-                    type: 'post',
-                    data: fd,
-                    contentType: false,
-                    processData: false,
-                    success: function(response){
+                
+                    // $.ajax({
+                    //     // url: '/upload',
+                    //     url: '/multiupload',
+                    //     type: 'post',
+                    //     data: fd,
+                    //     contentType: false,
+                    //     processData: false,
+                    //     success: function(response){
+                    //         getPublicImages();
+                    //         document.getElementById("upload-form").reset();
+                    //         window.location.href = window.location.href;                        
+                    //         // location.reload();
+                    //     },
+                    //     failure: function(jqXhr, textStatus, errorThrown) {       
+                    //         console.log(errorThrown);
+                    //     }, 
                         
-                    },
-                    failure: function(jqXhr, textStatus, errorThrown) {       
-                        console.log(errorThrown);
-                    }, 
+                    // });
+
+                $.when(upload_image(fd)).done(function(){
                     
                 });
             }
             
+            // window.location.href = window.location.href;   
+            $(document).ajaxStop(function() {
+                getPublicImages();
+                location.reload();
+            });
         }
-        getPublicImages();
-        document.getElementById("upload-form").reset();
-        location.reload();
     });
     
     

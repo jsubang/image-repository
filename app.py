@@ -66,7 +66,7 @@ def delete_image_file(file_id):
 @app.route('/')
 def index(name=None):
 
-    print("ok")
+    print("logged in as :" + str(session["user_id"]))
 
 
     return render_template('index.html', name=name)
@@ -101,8 +101,11 @@ def login(name=None):
 
 @app.route('/logout', methods = ['post'])
 def logout_request(name = None):
-    logout()
-    return redirect(url_for('index')), 200
+    # logout()
+    session['logged_in'] = False
+    session['username'] = ""
+    session['user_id'] = -1
+    return "logged out", 200
 
 # get public images only
 @app.route('/get_images', methods=['get'])
@@ -165,13 +168,13 @@ def multiupload(name=None):
         delete_image_file(image_id)
         del_image_record(image_id)   
 
-    add_image(6, filename, filename.split('.')[1], private_setting)
+    add_image(session['user_id'], filename, filename.split('.')[1], private_setting)
 
     # get the generated file_id from the server
-    output = get_image_id(6, filename)
+    output = get_image_id(session['user_id'], filename)
 
     if (output != -1):
-        file_id = get_image_id(6, filename)
+        file_id = get_image_id(session['user_id'], filename)
         img.save(os.path.join(app.config['UPLOAD_FOLDER'], str(file_id) + file_type))
     
     return "image uploaded", 200
