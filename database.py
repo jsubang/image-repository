@@ -105,9 +105,17 @@ def add_image(user_id, filename, filetype, cursor, db):
     cursor.execute(insert)
     db.commit()
     return True
+# gets the owner of an image with the inputted id, returns -1 if image is not in tha database
+def get_image_owner(id, cursor):
+    owner = -1
+    record = get_record("file_id", id, cursor, "image")
 
-def get_image():
-    pass
+    if(record == None):
+        owner = -1
+    else:
+        owner = record[1]
+
+    return owner
 
 def get_all_images(cursor):
     sel_cmd = "SELECT * FROM image"
@@ -125,3 +133,7 @@ def get_image_id(user_id, filename, cursor):
     result = () 
     result = cursor.fetchone()
     return result
+
+#deletes image record, returns true if record was removed, false otherwise
+def del_image_record(image_id, cursor, db):
+    pass

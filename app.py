@@ -46,6 +46,9 @@ def logout():
     return
 
 
+def delete_image_file(file):
+    pass
+
 db = get_db(psw)
 cursor = db.cursor()
 
@@ -104,19 +107,32 @@ def get_images(name=None):
     # get_files(cursor)
     return get_files(cursor), 200
 
+
 @app.route('/del_image', methods=['DELETE'])
 def delete(name=None):
+
+    print(session['logged_in'])
+    if(session['logged_in'] == False):
+        return "user not logged in", 401
+
     to_del = request.get_json()
     
     # id is to_del["file_id"]
-    print(to_del["file_id"])
+
+    file_id = to_del["file_id"]
 
     # get the current logged in user.
+    owner = get_image_owner(file_id, cursor)
 
+    if (owner == -1):
+        return "image does not exist", 404
+    
+    if (owner == session['user_id']):
+        # go ahead and delete
 
-
-    return "hueheuhue"
-
+        return "file deleted", 200
+    else:
+        return "user does not own the file", 401
 
 
 @app.route('/upload', methods=['post'])

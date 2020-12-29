@@ -60,11 +60,11 @@ function deleteImage(img_id) {
         // the response
         // dataType: "json",
         success: function(response, textstatus, xhr){
-            // console.log(response);          
+            console.log(response);          
         },
 
         failure: function(jqXhr, textStatus, errorThrown) {
-            console.log(errorThrown);
+            // console.log(errorThrown);
         } 
     });
 
