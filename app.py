@@ -9,10 +9,9 @@ from werkzeug.utils import secure_filename
 # database functions
 from database import *
 
-psw = "jarrylsubang"
+name = "jarrylsubang"
 
 def get_files(cursor):
-    # print(type(get_all_images(cursor)))
 
     records = []
 
@@ -26,9 +25,7 @@ def get_files(cursor):
             'private':x[4],
             'filetype':x[5]
         })
-
-        
-    # print(records)
+    
     return json.dumps(records)
 
 
@@ -45,35 +42,31 @@ def logout():
     session['user_id'] = -1
     return
 
+# deletes the image file from the server
+def delete_image_file(file_id, cursor):
 
-def delete_image_file(file):
-    pass
+    filetype = get_image_type(file_id, cursor)
+    filename = UPLOAD_FOLDER + str(file_id) + '.' + filetype
 
-db = get_db(psw)
+    # check if the file exists
+    if (os.path.exists(filename)):
+        os.remove(filename)
+    else:
+        print(filename + " not deleted because the file was not found.")
+    return
+
+# get the database credentials
+db = get_db(name)
 cursor = db.cursor()
-
-
-
-
-# initalize credentials
-# session['logged_in'] = False
-# session['username'] = ""
-# session['user_id'] = -1
-
 
 @app.route('/')
 def index(name=None):
-
     return render_template('index.html', name=name)
 
 
 @app.route('/login', methods=['post'])
 def login(name=None):
     login_details = request.get_json()
-    # print(login_details)
-    # print(login_details[0]["value"])
-    # print(login_details[1]["value"])
-
     username = login_details[0]["value"]
     password = login_details[1]["value"]
     response = []
@@ -104,21 +97,18 @@ def logout_request(name = None):
 
 @app.route('/get_images', methods=['get'])
 def get_images(name=None):
-    # get_files(cursor)
     return get_files(cursor), 200
 
 
 @app.route('/del_image', methods=['DELETE'])
 def delete(name=None):
 
-    print(session['logged_in'])
     if(session['logged_in'] == False):
         return "user not logged in", 401
 
     to_del = request.get_json()
     
-    # id is to_del["file_id"]
-
+    # get the file_id and file type
     file_id = to_del["file_id"]
 
     # get the current logged in user.
@@ -128,11 +118,16 @@ def delete(name=None):
         return "image does not exist", 404
     
     if (owner == session['user_id']):
-        # go ahead and delete
+       
+        # remove the file from the server
+        delete_image_file(file_id, cursor)
 
+        # remove from database
         del_image_record(file_id, cursor, db)
 
+
         return "file deleted", 200
+
     else:
         return "user does not own the file", 401
 
@@ -143,11 +138,14 @@ def upload(name=None):
     img = request.files['file']
     filename = secure_filename(img.filename)
     file_type = '.' + filename.split('.')[1]
+
+    # create a new image file record in the database
+    # TODO allow private and public, will need to change add_image
     add_image(6, filename, filename.split('.')[1], cursor, db)
 
-    # gets the generated file_id from the server which will be used to rename the 
-    # newly uploaded image.
+    # get the generated file_id from the server
     output = get_image_id(6, filename, cursor)
+
     if (output != ()):
         file_id = get_image_id(6, filename, cursor)[0]
         img.save(os.path.join(app.config['UPLOAD_FOLDER'], str(file_id) + file_type))

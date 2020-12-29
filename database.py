@@ -117,22 +117,38 @@ def get_image_owner(id, cursor):
 
     return owner
 
+# Gets all the image records from the database
 def get_all_images(cursor):
     sel_cmd = "SELECT * FROM image"
-    cursor.execute(sel_cmd)
-    result = ()    
+    cursor.execute(sel_cmd)  
     result = cursor.fetchall()
+    if(result == None):
+        result = ()
+
     return result
 
-# gets the id number that will correspond to the filename in the uploads directory, returns either a tuple or None
+# gets the id number that will correspond to the filename in the uploads directory, returns either a tuple or () if not found
 def get_image_id(user_id, filename, cursor):
     user_condition = "user_id = {0}".format(user_id)
     file_condition = "filename = '{0}'".format(filename)
     sel_cmd = "SELECT DISTINCT file_id FROM image WHERE {0} AND {1}".format(user_condition, file_condition)
     cursor.execute(sel_cmd)
+    result = cursor.fetchone()
+    if(result == None):
+        result = ()
+    return result
+
+# get the file extension of the image from the database, returns the type or "" if not found
+def get_image_type(file_id, cursor):
+    sel_cmd = "SELECT DISTINCT filetype FROM image WHERE file_id = {0}".format(file_id)
+    cursor.execute(sel_cmd)
     result = () 
     result = cursor.fetchone()
-    return result
+    
+    if(result == None):
+        result = ""
+    else:
+        return result[0]
 
 #deletes image record, returns true if record was removed, false otherwise
 def del_image_record(image_id, cursor, db):
