@@ -2,6 +2,8 @@
 
 function getPublicImages() {
 
+    
+
     $.ajax({
         type: 'get',
         url: '/get_images',
@@ -31,7 +33,7 @@ function getUploads() {
 }
 
 function clearImages() {
-
+    $("#image-display-section").empty();
 }
 
 
@@ -60,7 +62,7 @@ function deleteImage(img_id) {
         // the response
         // dataType: "json",
         success: function(response, textstatus, xhr){
-            console.log(response);          
+            getPublicImages()       
         },
 
         failure: function(jqXhr, textStatus, errorThrown) {
@@ -75,6 +77,9 @@ function getLoggedIn() {
 }
 
 function displayImages(json) {
+
+    // clear first
+    $("#image-display-section").empty();
 
     // there will be an array of jsons, each element will be a 
 
@@ -130,6 +135,12 @@ function displayImages(json) {
         outerDiv.appendChild(innerDiv);
         displaySection.appendChild(outerDiv);
     }
+
+
+    
+
+
+
 }
 
 $(document).ready(function() {
@@ -167,6 +178,7 @@ $(document).ready(function() {
                 success: function(response){
                     // location.reload();
                     getPublicImages();
+                    
                 },
                 failure: function(jqXhr, textStatus, errorThrown) {       
             

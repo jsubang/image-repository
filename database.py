@@ -136,4 +136,7 @@ def get_image_id(user_id, filename, cursor):
 
 #deletes image record, returns true if record was removed, false otherwise
 def del_image_record(image_id, cursor, db):
-    pass
+    del_cmd = "DELETE FROM image WHERE file_id = {0}".format(image_id)
+    cursor.execute(del_cmd)
+    db.commit()
+    return

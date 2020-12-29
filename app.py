@@ -130,6 +130,8 @@ def delete(name=None):
     if (owner == session['user_id']):
         # go ahead and delete
 
+        del_image_record(file_id, cursor, db)
+
         return "file deleted", 200
     else:
         return "user does not own the file", 401
