@@ -139,13 +139,13 @@ def check_credentials(username, password):
 
 
 ##### functions for image table #####
-def add_image(user_id, filename, filetype):
+def add_image(user_id, filename, filetype, private):
 
     # connect to db
     db = get_db(name)
     cursor = db.cursor()
 
-    insert = "INSERT INTO image (user_id, filename, filetype) VALUES ({0}, '{1}', '{2}')".format(user_id, filename, filetype)
+    insert = "INSERT INTO image (user_id, filename, filetype, private) VALUES ({0}, '{1}', '{2}', {3})".format(user_id, filename, filetype, private)
     cursor.execute(insert)
     db.commit()
 

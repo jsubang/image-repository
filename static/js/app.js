@@ -1,5 +1,7 @@
 // draw upload contents
 
+
+
 function getPublicImages() {
 
     
@@ -21,6 +23,10 @@ function getPublicImages() {
             console.log(errorThrown);
         } 
     });
+
+}
+
+function getPrivateImages() {
 
 }
 
@@ -151,8 +157,11 @@ $(document).ready(function() {
         event.preventDefault();
     
         let fileInput = document.getElementById('img');
-        
-        console.log()
+
+        let isPrivate = $("#private").prop('checked');
+
+        // console.log(isPrivate)
+
         
         if(fileInput.files.length == 0) {
             alert("please select a image to upload");
@@ -169,6 +178,11 @@ $(document).ready(function() {
                 let fd = new FormData();
                 let img = fileInput.files[i];
                 fd.append('file', img);
+                fd.set('private', isPrivate.toString());
+
+
+
+                // fd.append('private', )
 
                 // console.log(fileInput.files[i]);
 
@@ -189,11 +203,10 @@ $(document).ready(function() {
                 });
             }
             
-            getPublicImages();
-            document.getElementById("upload-form").reset();
-
         }
-        
+        getPublicImages();
+        document.getElementById("upload-form").reset();
+        location.reload();
     });
     
     
