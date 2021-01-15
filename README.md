@@ -1,3 +1,11 @@
+Inital installation
+(Windows 10) Enter the commands in the root directory of the project: 
+
+$ py -3 -m venv venv
+$ venv\Scripts\activate
+$ pip install Flask
+$ pip install mysqlclient
+
 To start the web app server, goto the root directory of the application using a terminal, and enter the following command:
 
     $ flask run --host=0.0.0.0

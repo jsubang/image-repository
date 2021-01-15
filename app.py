@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 import os
+from os import path
+
 import json
 
 from flask import Flask, flash, render_template, request, redirect, url_for, session
@@ -35,6 +37,11 @@ app.secret_key = 'gXL0cmGE6vwUxmhYOnzxXEuHNq1e6u2zGUDLni1v'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['SESSION_COOKIE_SAMESITE'] = "Lax"
 
+# create upload folder if it doesnt already exist:
+if not path.exists(UPLOAD_FOLDER):
+    os.mkdir(UPLOAD_FOLDER)
+    print("upload directory created")
+
 # logout
 def logout():
     session['logged_in'] = False
@@ -66,9 +73,7 @@ def delete_image_file(file_id):
 @app.route('/')
 def index(name=None):
 
-    print("logged in as :" + str(session["user_id"]))
-
-
+    # print("logged in as :" + str(session["user_id"]))
     return render_template('index.html', name=name)
 
 
