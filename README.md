@@ -22,3 +22,4 @@ Test credentials you can use to login are:
     username: jarryl password: password
 
 When a user is logged in they can upload any number of images using the choose file button and selecting upload. To make your uploads private, ensure that you tick off the checkbox for private before clicking on upload.
+
